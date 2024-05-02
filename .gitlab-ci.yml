@@ -10,20 +10,20 @@ variables:
 #   - python -m build
 #   - python -m pip install twine
 
-# sonarcloud-check:
-#   image:
-#     name: sonarsource/sonar-scanner-cli:latest
-#     entrypoint: [""]
-#   cache:
-#     key: "${CI_JOB_NAME}"
-#     paths:
-#       - .sonar/cache
-#   script:
-#     - sonar-scanner
-#   only:
-#     - merge_requests
-#     - main
-#     - develop
+sonarcloud-check:
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner
+  only:
+    - merge_requests
+    - main
+    - develop
 
 build-test-pip-package:
   stage: deploy
@@ -35,7 +35,7 @@ build-test-pip-package:
     - python -m pip install twine
     - python -m twine upload --repository testpypi dist/* --config-file /tmp/.pypirc
   only:
-    - develop
+    - /^dev_[0-9]+(?:.[0-9]+)+$/ # regular expression
 
 build-pip-package:
   stage: deploy
