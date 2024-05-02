@@ -24,7 +24,7 @@ build-test-pip-package:
     - python -m pip install build
     - python -m build
     - python -m pip install twine
-    - python -m twine upload --repository testpypi dist/*
+    - python -m twine upload --repository testpypi dist/* --config-file .pypirc
   only:
     - develop
 
@@ -35,6 +35,6 @@ build-pip-package:
     - python -m pip install build
     - python -m build
     - python -m pip install twine
-    - python -m twine upload dist/*
+    - python -m twine upload dist/* --config-file .pypirc
   only:
     - tags
