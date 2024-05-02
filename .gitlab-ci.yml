@@ -48,3 +48,5 @@ build-pip-package:
     - python -m twine upload dist/* --config-file /tmp/.pypirc
   only:
     - tags
+  except:
+    - /^dev_[0-9]+(?:.[0-9]+)+$/ # regular expression
