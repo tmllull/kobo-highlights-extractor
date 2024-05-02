@@ -17,6 +17,8 @@ with open(os.path.join(base_path, "README.md")) as f:
 REQUIREMENTS = ["Jinja2"]
 
 setuptools.setup(
+    # name="kobo-highlights-extractor",
+    # description = "A package to extract highlights from kobo books",
     version=version,
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
