@@ -1,0 +1,75 @@
+site_name: Kobo Highlight Extractor
+site_description: Kobo Highlight Extractor
+theme:
+  language: es
+  #logo: assets/images/logo.png
+  #favicon: assets/images/icon.png
+  name: material
+  #font:
+  #  text: Ubuntu
+  palette:
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.footer
+    - navigation.top
+    #- navigation.tabs
+    #- navigation.tabs.sticky
+    - navigation.tracking
+    # - navigation.sections
+    - navigation.prune
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - navigation.footer
+    - toc.follow
+
+markdown_extensions:
+  - nl2br
+  - admonition
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - footnotes
+
+plugins:
+  - search
+  - callouts
