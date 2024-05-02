@@ -1,6 +1,14 @@
+# image: python:3.11-alpine
+
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
   GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
+
+# before_script:
+#   - cat $PYPIRC > /tmp/.pypirc
+#   - python -m pip install build
+#   - python -m build
+#   - python -m pip install twine
 
 # sonarcloud-check:
 #   image:
@@ -21,10 +29,11 @@ build-test-pip-package:
   stage: deploy
   image: python:3.11
   script:
+    - cat $PYPIRC > /tmp/.pypirc
     - python -m pip install build
     - python -m build
     - python -m pip install twine
-    - python -m twine upload --repository testpypi dist/* --config-file .pypirc
+    - python -m twine upload --repository testpypi dist/* --config-file /tmp/.pypirc
   only:
     - develop
 
@@ -32,9 +41,10 @@ build-pip-package:
   stage: deploy
   image: python:3.11
   script:
+    - cat $PYPIRC > /tmp/.pypirc
     - python -m pip install build
     - python -m build
     - python -m pip install twine
-    - python -m twine upload dist/* --config-file .pypirc
+    - python -m twine upload dist/* --config-file /tmp/.pypirc
   only:
     - tags
