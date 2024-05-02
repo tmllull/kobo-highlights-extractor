@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kobo_highlights_extractor"
-version = "0.0.1"
 authors = [{ name = "Toni Miquel Llull", email = "tonimiquel.llull@gmail.com" }]
 description = "A package to extract highlights from kobo books"
 readme = "README.md"
