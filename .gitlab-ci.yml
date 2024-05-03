@@ -25,18 +25,6 @@ sonarcloud-check:
     - main
     - develop
 
-build-test-pip-package:
-  stage: deploy
-  image: python:3.11
-  script:
-    - cat $PYPIRC > /tmp/.pypirc
-    - python -m pip install build
-    - python -m build
-    - python -m pip install twine
-    - python -m twine upload --repository testpypi dist/* --config-file /tmp/.pypirc
-  only:
-    - /^dev_[0-9]+(?:.[0-9]+)+$/ # regular expression
-
 build-pip-package:
   stage: deploy
   image: python:3.11
@@ -48,5 +36,3 @@ build-pip-package:
     - python -m twine upload dist/* --config-file /tmp/.pypirc
   only:
     - tags
-  except:
-    - /^dev_[0-9]+(?:.[0-9]+)+$/ # regular expression
