@@ -1,6 +1,4 @@
 import os
-from glob import glob
-from os.path import basename, splitext
 
 import setuptools
 
