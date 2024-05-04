@@ -10,7 +10,7 @@ try:
     else:
         version = os.environ["CI_JOB_ID"]
 except KeyError:
-    version = "0.0.11"
+    version = "0.0.2"
 
 REQUIREMENTS = ["Jinja2==3.1.3"]
 

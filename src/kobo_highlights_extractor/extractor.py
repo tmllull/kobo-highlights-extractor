@@ -9,18 +9,15 @@ TEMPLATE = """
 # {{ book_data['book_title'] }}
 
 {% for chapter in book_data['chapters'] %}
-
 ## {{ chapter['chapter_title'] }}
 
 {% for highlight in chapter['highlights'] %}
-
 > {{ highlight['highlight'].strip() }}
-
 {% if highlight['note'] is not none and highlight['note'] != "" %}
 Note: {{ highlight['note'] }}
 {% endif %}
 
-Progress: {{ highlight['chapter_progress'] }} %
+Chapter progress: {{ highlight['chapter_progress'] }} %
 Date: {{ highlight['date'] }}
 
 ---
@@ -41,12 +38,12 @@ class KoboHighlightsExtractor:
         self.cursor = connection.cursor()
         if template is None:
             print("Using default template...")
-            self.template = Template(TEMPLATE)
+            template_content = TEMPLATE
         else:
             print("Using provided template:", str(template), "...")
             with open(template, "r") as file:
                 template_content = file.read()
-            self.template = Template(template_content)
+        self.template = Template(template_content, trim_blocks=True, lstrip_blocks=True)
         if highlights_path is None:
             self.highlights_path = "highlights/"
         else:
@@ -67,33 +64,44 @@ class KoboHighlightsExtractor:
     def get_chapters(self, book_id):
         chapters = []
         for row in self.cursor.execute(
-            "SELECT ContentID, Title FROM content WHERE BookID = ? ORDER BY VolumeIndex ASC",
+            "SELECT ContentID, Title, MimeType, BookTitle FROM content WHERE BookID = ? ORDER BY VolumeIndex ASC",
             (book_id,),
         ):
             chapter = {}
+            id = row[0]
+            title = row[1]
+            mime_type = row[2]
+            book_title = row[3]
             if row[0] is not None:
-                chapter["id"] = row[0]
-                chapter["title"] = row[1]
+                chapter["id"] = id
+                chapter["title"] = title
+                chapter["mime_type"] = mime_type
+                chapter["book_title"] = book_title
+                chapter["book_id"] = book_id
                 chapters.append(chapter)
         return chapters
 
-    def get_highlights(self, chapter_id):
+    def get_highlights(self, chapter):
         highlights = []
+        chapter_id = chapter["id"]
         query = (
             "SELECT "
-            + "VolumeID, ContentID, Text, Annotation, DateCreated, ChapterProgress FROM Bookmark WHERE (Type = 'highlight' OR Type = 'note') AND ContentID = "
-            + "?"
-            + " ORDER BY DateCreated ASC"
+            + "VolumeID, ContentID, Text, Annotation, DateCreated, ChapterProgress FROM Bookmark WHERE (Type = 'highlight' OR Type = 'note') "
+            + "ORDER BY DateCreated ASC"
         )
-        for row in self.cursor.execute(query, (chapter_id,)):
-            highlight = {}
-            highlight["book_id"] = row[0]
-            highlight["content_id"] = row[1]
-            highlight["text"] = row[2]
-            highlight["note"] = row[3]
-            highlight["date"] = row[4].split("T")[0]
-            highlight["chapter_progress"] = row[5]
-            highlights.append(highlight)
+        for row in self.cursor.execute(query):
+            content_id = row[1]
+            if "file" not in content_id:
+                content_id += "-"
+            if content_id in chapter_id:
+                highlight = {}
+                highlight["book_id"] = row[0]
+                highlight["content_id"] = content_id
+                highlight["text"] = row[2]
+                highlight["note"] = row[3]
+                highlight["date"] = row[4].split("T")[0]
+                highlight["chapter_progress"] = row[5]
+                highlights.append(highlight)
         return highlights
 
     def highlight_page(self, chapter_start_page, chapter_pages, percent):
@@ -126,7 +134,7 @@ class KoboHighlightsExtractor:
             book_highlights["chapters"] = []
             chapters = self.get_chapters(book["id"])
             for chapter in chapters:
-                highlights = self.get_highlights(chapter["id"])
+                highlights = self.get_highlights(chapter)
                 if len(highlights) == 0:
                     continue
                 chapter_info = {}
