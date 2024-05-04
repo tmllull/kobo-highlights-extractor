@@ -68,12 +68,12 @@ class KoboHighlightsExtractor:
             (book_id,),
         ):
             chapter = {}
-            id = row[0]
+            chapter_id = row[0]
             title = row[1]
             mime_type = row[2]
             book_title = row[3]
             if row[0] is not None:
-                chapter["id"] = id
+                chapter["id"] = chapter_id
                 chapter["title"] = title
                 chapter["mime_type"] = mime_type
                 chapter["book_title"] = book_title
