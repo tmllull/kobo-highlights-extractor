@@ -55,11 +55,22 @@ class KoboHighlightsExtractor:
             "SELECT DISTINCT BookID, BookTitle FROM content"
         ):
             book = {}
-            if row[0] is not None:
+            if row[0] and row[1] is not None:
                 book["id"] = row[0]
                 book["title"] = row[1]
                 books.append(book)
         return books
+
+    def get_total_words(self, book):
+        print("Getting total words for book:", book["title"])
+        total_words = 0
+        for row in self.cursor.execute(
+            "SELECT WordCount FROM content WHERE BookTitle = ?",
+            (book["title"],),
+        ):
+            if row[0] > 0:
+                total_words += row[0]
+        return total_words
 
     def get_chapters(self, book_id):
         chapters = []
@@ -130,6 +141,7 @@ class KoboHighlightsExtractor:
         # Save highlight in md files
         for book in books:
             book_highlights = {}
+            book_highlights["book_id"] = book["id"]
             book_highlights["book_title"] = book["title"]
             book_highlights["chapters"] = []
             chapters = self.get_chapters(book["id"])
@@ -144,12 +156,15 @@ class KoboHighlightsExtractor:
                     highlight_info = self.prepare_highlight(highlight)
                     chapter_info["highlights"].append(highlight_info)
                 book_highlights["chapters"].append(chapter_info)
+            if len(book_highlights["chapters"]) > 0:
+                print("Total words: " + str(self.get_total_words(book)))
                 books_highlights.append(book_highlights)
-        for book_data in books_highlights:
+        for highlight_data in books_highlights:
             try:
-                rendered_content = self.template.render(book_data=book_data)
+                print("Extracting: " + highlight_data["book_title"])
+                rendered_content = self.template.render(book_data=highlight_data)
                 with open(
-                    self.highlights_path + book_data["book_title"] + ".md", "wb"
+                    self.highlights_path + highlight_data["book_title"] + ".md", "wb"
                 ) as f:
                     f.write(rendered_content.encode("utf-8"))
             except Exception as e:
