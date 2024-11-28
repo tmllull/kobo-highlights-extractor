@@ -1,6 +1,6 @@
 import argparse
 
-from kobo_highlights_extractor.extractor import KoboHighlightsExtractor
+from src.kobo_highlights_extractor.extractor import KoboHighlightsExtractor
 
 # Check if DB is passed
 parser = argparse.ArgumentParser()
@@ -20,5 +20,6 @@ highlights_path = args.highlights_path
 extractor = KoboHighlightsExtractor(
     db_file=db_file, template=template, highlights_path=highlights_path
 )
-extractor.extract_highlights()
+# extractor.extract_highlights()
+extractor.get_events()
 print("Done")

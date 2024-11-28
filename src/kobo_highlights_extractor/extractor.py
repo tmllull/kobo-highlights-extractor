@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import binascii
+import json
 import os
 import sqlite3
 import sys
@@ -35,6 +37,7 @@ class KoboHighlightsExtractor:
         else:
             print("Using provided sqlite database:", str(db_file), "...")
         connection = sqlite3.connect(db_file)
+        connection.text_factory = bytes
         self.cursor = connection.cursor()
         if template is None:
             print("Using default template...")
@@ -48,6 +51,44 @@ class KoboHighlightsExtractor:
             self.highlights_path = "highlights/"
         else:
             self.highlights_path = highlights_path + "/"
+
+    def manual_decode(self, blob_data):
+        decoded_string = ""
+        for byte in blob_data:
+            try:
+                # Intentar decodificar cada byte como un carácter UTF-8
+                char = chr(byte)  # Convertir el byte a carácter
+                decoded_string += char
+            except UnicodeDecodeError:
+                # Manejar el caso de bytes que no se pueden decodificar como UTF-8
+                decoded_string += "<?>"
+        return decoded_string
+
+    def get_events(self):
+        # Intentar seleccionar los datos de la columna problematica
+        try:
+            self.cursor.execute("SELECT ExtraData FROM Event WHERE EventType = 46")
+            for row in self.cursor.fetchall():
+                # print(len(row))
+                # print(row[0])
+                print(self.manual_decode(row[0]))
+        except sqlite3.DatabaseError as e:
+            print(f"Error: {e}")
+
+        # events = []
+        # self.cursor.execute("SELECT rowid, ExtraData FROM Event")
+        # rows = self.cursor.fetchall()
+        # for row in rows:
+        #     rowid, extra_data = row
+        #     try:
+        #         # Intentar decodificar como UTF-8
+        #         extra_data_utf8 = extra_data.decode("utf-8")
+        #     except UnicodeDecodeError:
+        #         # Si falla, intentar otra codificación y luego reconvertir a UTF-8
+        #         extra_data_utf8 = self.convert_to_utf8(extra_data)
+
+        #     events.append(extra_data_utf8)
+        # return events
 
     def get_books(self):
         books = []
@@ -93,6 +134,7 @@ class KoboHighlightsExtractor:
         return chapters
 
     def get_highlights(self, chapter):
+
         highlights = []
         chapter_id = chapter["id"]
         query = (
@@ -169,3 +211,17 @@ class KoboHighlightsExtractor:
                     f.write(rendered_content.encode("utf-8"))
             except Exception as e:
                 print(e)
+
+
+test = ""
+
+
+def format(text):
+    return (
+        text.replace("\n", " ")
+        .replace("\t", " ")
+        .replace("\r", " ")
+        .replace("  ", " ")
+        .replace("  ", " ")
+        .replace("  ", " ")
+    )
